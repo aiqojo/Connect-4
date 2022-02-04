@@ -11,6 +11,8 @@ class Board:
 
     def add_checker(self, color, column):
 
+        column = int(column)
+
         row = self.find_lowest(column - 1)
 
         if row == -1:
@@ -61,48 +63,74 @@ class Board:
 
         for row in reversed(range(3, self.height)):
             for column in range(self.width - 3):
-                
+
                 # Checking each row
                 for x in range(4):
-                    if self.board[row][column + x] == "Y":
-                        win_counter += 1
-                    elif self.board[row][column + x] == "R":
-                        win_counter -= 1
+                    for y in range(4):
+                        if self.board[row - x][column + y] == "Y":
+                            win_counter += 1
+                        elif self.board[row - x][column + y] == "R":
+                            win_counter -= 1
 
-                if self.counter_Check() == "R":
-                    print("R wins!")
-                elif self.counter_Check() == "Y":
-                    print("Y wins!")
+                    if self.counter_Check(win_counter) == "R":
+                        print("R wins!")
+                        return True
+                    elif self.counter_Check(win_counter) == "Y":
+                        print("Y wins!")
+                        return True
+                    
+                    win_counter = 0
 
-                win_counter = 0
 
                 # Checking each column
                 for x in range(4):
-                    if self.board[row - x][column] == "Y":
-                        win_counter += 1
-                    elif self.board[row - x][column] == "R":
-                        win_counter -= 1
+                    for y in range(4):
+                        if self.board[row - y][column + x] == "Y":
+                            win_counter += 1
+                        elif self.board[row - y][column + x] == "R":
+                            win_counter -= 1
 
-                if self.counter_Check() == "R":
-                    print("R wins!")
-                elif self.counter_Check() == "Y":
-                    print("Y wins!")
+                    if self.counter_Check(win_counter) == "R":
+                        print("R wins!")
+                        return True
+                    elif self.counter_Check(win_counter) == "Y":
+                        print("Y wins!")
+                        return True
+                    win_counter = 0
+
+                win_counter = 0
+
 
                 # Checking the 2 diagonals
                 for x in range(4):
                     if self.board[row - x][column + x] == "Y":
                         win_counter += 1
-                    elif self.board[row + x][column - x] == "R":
+                    if self.board[row - x][column + x] == "R":
+                        win_counter -= 1
+                
+                if self.counter_Check(win_counter) == "R":
+                    print("R wins!")
+                    return True
+                elif self.counter_Check(win_counter) == "Y":
+                    print("Y wins!")
+                    return True
+
+                win_counter = 0
+
+                for x in range(4):
+                    if self.board[row - 3 + x][column + x] == "Y":
+                        win_counter += 1
+                    if self.board[row - 3 + x][column + x] == "R":
                         win_counter -= 1
 
-                if self.counter_Check() == "R":
+                if self.counter_Check(win_counter) == "R":
                     print("R wins!")
-                elif self.counter_Check() == "Y":
+                    return True
+                elif self.counter_Check(win_counter) == "Y":
                     print("Y wins!")
+                    return True
 
-
-    
-                
+                win_counter = 0                
 
 
         return False
