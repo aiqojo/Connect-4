@@ -7,7 +7,7 @@ class Board:
         self.width = width
         self.height = height
 
-        self.board = [['0']*width for x in range(height)]
+        self.board = [['.']*width for x in range(height)]
 
     def add_checker(self, color, column):
 
@@ -20,6 +20,17 @@ class Board:
         else:
             self.board[row][column - 1] = color.upper()
             return True
+
+    def find_empty_columns(self):
+        arr = list(range(0, self.width+1))
+
+        for x in arr:
+            if self.find_lowest(x) == '-1':
+                arr.remove(x)
+        
+        return arr
+
+
     
     # Find lowest
     # If lowest isn't found, return -1, as nothing can be placed in that row
@@ -27,7 +38,7 @@ class Board:
         lowest = -1
 
         for x in reversed(range(self.height)):
-            if self.board[x][column] == '0':
+            if self.board[x][column] == '.':
                 lowest = x
                 break
 

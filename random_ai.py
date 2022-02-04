@@ -3,5 +3,5 @@ import random
 
 class random_ai:
 
-    def answer(width):
-        return random.randrange(width)
+    def answer(arr):
+        return random.random.choice(arr)
