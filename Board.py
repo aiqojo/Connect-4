@@ -3,34 +3,44 @@
 
 class Board:
 
-    def __init__(self, width, height):
+    p1 = "X"
+    p2 = "O"
+
+    def __init__(self, width, height, print):
         self.width = width
         self.height = height
+        self.print = print
 
         self.board = [['.']*width for x in range(height)]
 
-    # column is "human" row, starting from 1 not 0
+    def reset(self):
+        if self.print:
+            print("-------NEW GAME-------")
+        self.board = [['.']*self.width for x in range(self.height)]
+
     def add_checker(self, color, column):
 
         column = int(column)
 
-        # subtracting 1 
-        row = self.find_lowest(column - 1)
+        row = self.find_lowest(column)
 
         if row == -1:
             return False
         else:
-            self.board[row][column - 1] = color.upper()
+            if self.print:
+                print("COLOR:", color, "ROW:", row, "COLUMN:", column)
+            self.board[row][column] = color.upper()
             return True
 
     def find_empty_columns(self):
         arr = list(range(0, self.width))
+        arrr = []
 
         for x in arr:
-            if self.find_lowest(x) == '-1':
-                arr.remove(x)
+            if not self.find_lowest(x) == -1:
+                arrr.append(x)
         
-        return arr
+        return arrr
 
 
     # Find lowest
@@ -43,8 +53,10 @@ class Board:
                 lowest = x
                 break
 
-        if lowest == -1:
+        if lowest == -1 and self.print:
             print("Column " + str(column + 1) + " is full!")
+            return lowest
+        elif lowest == -1:
             return lowest
         else:
             return lowest
@@ -61,16 +73,16 @@ class Board:
 
     def counter_Check(self, win_counter):
         if win_counter == -4:
-            return "R"
+            return self.p1
         elif win_counter == 4:
-            return "Y"
+            return self.p2
         else:
             return ""
 
     def check_win(self):
 
-        # If this hits 4, win for yellow
-        # If this hits -4, win for red
+        # If this hits -4, win for red (p1)
+        # If this hits 4, win for yellow (p2)
         win_counter = 0
 
         for row in reversed(range(3, self.height)):
@@ -79,16 +91,18 @@ class Board:
                 # Checking each row
                 for x in range(4):
                     for y in range(4):
-                        if self.board[row - x][column + y] == "Y":
-                            win_counter += 1
-                        elif self.board[row - x][column + y] == "R":
+                        if self.board[row - x][column + y] == self.p1:
                             win_counter -= 1
+                        elif self.board[row - x][column + y] == self.p2:
+                            win_counter += 1
 
-                    if self.counter_Check(win_counter) == "R":
-                        print("R wins!")
+                    if self.counter_Check(win_counter) == self.p1:
+                        if self.print:
+                            print("Red (X) wins!")
                         return True
-                    elif self.counter_Check(win_counter) == "Y":
-                        print("Y wins!")
+                    elif self.counter_Check(win_counter) == self.p2:
+                        if self.print:
+                            print("Yellow (O) wins!")
                         return True
                     
                     win_counter = 0
@@ -97,16 +111,18 @@ class Board:
                 # Checking each column
                 for x in range(4):
                     for y in range(4):
-                        if self.board[row - y][column + x] == "Y":
-                            win_counter += 1
-                        elif self.board[row - y][column + x] == "R":
+                        if self.board[row - y][column + x] == self.p1:
                             win_counter -= 1
+                        elif self.board[row - y][column + x] == self.p2:
+                            win_counter += 1
 
-                    if self.counter_Check(win_counter) == "R":
-                        print("R wins!")
+                    if self.counter_Check(win_counter) == self.p1:
+                        if self.print:
+                            print("Red (X) wins!")
                         return True
-                    elif self.counter_Check(win_counter) == "Y":
-                        print("Y wins!")
+                    elif self.counter_Check(win_counter) == self.p2:
+                        if self.print:
+                            print("Yellow (O) wins!")
                         return True
                     win_counter = 0
 
@@ -115,31 +131,35 @@ class Board:
 
                 # Checking the 2 diagonals
                 for x in range(4):
-                    if self.board[row - x][column + x] == "Y":
-                        win_counter += 1
-                    if self.board[row - x][column + x] == "R":
+                    if self.board[row - x][column + x] == self.p1:
                         win_counter -= 1
+                    if self.board[row - x][column + x] == self.p2:
+                        win_counter += 1
                 
-                if self.counter_Check(win_counter) == "R":
-                    print("R wins!")
+                if self.counter_Check(win_counter) == self.p1:
+                    if self.print:
+                        print("Red (X) wins!")
                     return True
-                elif self.counter_Check(win_counter) == "Y":
-                    print("Y wins!")
+                elif self.counter_Check(win_counter) == self.p2:
+                    if self.print:
+                        print("Yellow (O) wins!")
                     return True
 
                 win_counter = 0
 
                 for x in range(4):
-                    if self.board[row - 3 + x][column + x] == "Y":
-                        win_counter += 1
-                    if self.board[row - 3 + x][column + x] == "R":
+                    if self.board[row - 3 + x][column + x] == self.p1:
                         win_counter -= 1
+                    if self.board[row - 3 + x][column + x] == self.p2:
+                        win_counter += 1
 
-                if self.counter_Check(win_counter) == "R":
-                    print("R wins!")
+                if self.counter_Check(win_counter) == self.p1:
+                    if self.print:
+                        print("Red (X) wins!")
                     return True
-                elif self.counter_Check(win_counter) == "Y":
-                    print("Y wins!")
+                elif self.counter_Check(win_counter) == self.p2:
+                    if self.print:
+                        print("Yellow (O) wins!")
                     return True
 
                 win_counter = 0                
