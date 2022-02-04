@@ -3,5 +3,14 @@ import random
 
 class random_ai:
 
-    def answer(arr):
-        return random.random.choice(arr)
+    def answer(self, arr):
+
+        if len(arr) == 0:
+            return -1
+        else:
+            return random.choice(arr)
+
+
+
+
+

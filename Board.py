@@ -9,10 +9,12 @@ class Board:
 
         self.board = [['.']*width for x in range(height)]
 
+    # column is "human" row, starting from 1 not 0
     def add_checker(self, color, column):
 
         column = int(column)
 
+        # subtracting 1 
         row = self.find_lowest(column - 1)
 
         if row == -1:
@@ -22,7 +24,7 @@ class Board:
             return True
 
     def find_empty_columns(self):
-        arr = list(range(0, self.width+1))
+        arr = list(range(0, self.width))
 
         for x in arr:
             if self.find_lowest(x) == '-1':
@@ -31,7 +33,6 @@ class Board:
         return arr
 
 
-    
     # Find lowest
     # If lowest isn't found, return -1, as nothing can be placed in that row
     def find_lowest(self, column):
@@ -145,4 +146,3 @@ class Board:
 
 
         return False
-        

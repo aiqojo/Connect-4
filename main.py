@@ -1,7 +1,7 @@
 from Board import *
 from random_ai import random_ai
 from ai_handler import ai_handler
-import game_handler
+from game_handler import game_handler
 
 def main():
 
@@ -14,7 +14,12 @@ def main():
 
     randy = ai_handler("random")
 
-    game = game_handler(randy)
+    game = game_handler(board, randy, randy, 1)
+
+    winner = game.play_round()
+
+
+
 
 if __name__ == "__main__":
     main()
