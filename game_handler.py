@@ -5,8 +5,8 @@ class game_handler():
 
     def __init__(self, board, ai_1, ai_2, delay, print):
         self.board = board
-        self.ai_1 = ai_1
-        self.ai_2 = ai_2
+        self.ai_1 = ai_1 # red (X)
+        self.ai_2 = ai_2 # yellow (O)
         self.delay = delay
         self.print = print
 
@@ -21,7 +21,7 @@ class game_handler():
             if self.print:
                 print("Red's turn! (X)")
             #column_choice = input("Enter column: ")
-            column_choice = self.ai_1.answer(self.board.find_empty_columns())
+            column_choice = self.ai_1.answer(self.board.find_empty_columns(), self.board)
 
             if self.print:
                 print("RED'S CHOICE IS: ", column_choice)
@@ -56,7 +56,7 @@ class game_handler():
             if self.print:
                 print("Yellow's turn! (O)")
             #column_choice = input("Enter column: ")
-            column_choice = self.ai_2.answer(self.board.find_empty_columns())
+            column_choice = self.ai_2.answer(self.board.find_empty_columns(), self.board)
 
             if self.print:
                 print("YELLOW'S CHOICE IS: ", column_choice)

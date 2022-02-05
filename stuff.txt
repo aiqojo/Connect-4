@@ -1,0 +1,29 @@
+t1 = threading.Thread(target=run_cycle, args=(red_wins, yellow_wins, ties, i, False))
+        t2 = threading.Thread(target=run_cycle, args=(red_wins, yellow_wins, ties, i, False))
+
+        t1.start()
+        t2.start()
+
+        t1.join()
+        t2.join()
+
+        red_wins += t1.red_wins
+        yellow_wins += t1.yellow_wins
+        ties += t1.ties
+        
+        red_wins += t2.red_wins
+        yellow_wins += t2.yellow_wins
+        ties += t2.ties
+
+
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            f1 = executor.submit(run_cycle, red_wins, yellow_wins, ties, i, False)
+            
+            f1_answer = f1.result()
+
+            print(f1_answer)
+
+            red_wins += f1_answer[0]
+            yellow_wins += f1_answer[1]
+            ties += f1_answer[2]

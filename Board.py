@@ -42,6 +42,9 @@ class Board:
         
         return arrr
 
+    def get_location_color(self, row, column):
+        return self.board[row][column]
+
 
     # Find lowest
     # If lowest isn't found, return -1, as nothing can be placed in that row
@@ -162,7 +165,12 @@ class Board:
                         print("Yellow (O) wins!")
                     return True
 
-                win_counter = 0                
-
+                win_counter = 0 
 
         return False
+
+    def get_height(self):
+            return self.height
+
+    def get_width(self):
+        return self.width
