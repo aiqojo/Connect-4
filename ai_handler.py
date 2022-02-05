@@ -6,13 +6,13 @@ from randosmart_ai import randosmart_ai
 # random, 
 class ai_handler():
     
-    def __init__(self, ai, color):
+    def __init__(self, ai, colors, which_color):
         if ai == "player":
-            self.ai = player(color)
-        elif ai == "random":
-            self.ai = random_ai(color)
+            self.ai = player(colors[which_color])
+        elif ai == "randy":
+            self.ai = random_ai(colors[which_color])
         elif ai == "randosmart":
-            self.ai = randosmart_ai(color)
+            self.ai = randosmart_ai(colors[which_color])
         self.timer = 0
     
 

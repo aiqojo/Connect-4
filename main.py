@@ -4,11 +4,11 @@ from game_handler import game_handler
 import time
 import concurrent.futures
 
+#randogenius
+#randoprodigy
+
 def main():
-    run_cycle(1000000)
-
-
-
+    run_cycle(100000)
 
 
 
@@ -24,17 +24,17 @@ def run_cycle(rounds):
     height = 6
     sleep_time = 2
 
+    colors = ["X", "O"]
+
     board = Board(width, height, False)
-    red = ai_handler("player", "X")
-    yellow = ai_handler("randosmart", "O")
-    game = game_handler(board, red, yellow, 1, True)
+    red = ai_handler("randosmart", colors, 0)
+    yellow = ai_handler("randosmart", colors, 1)
+    game = game_handler(board, red, yellow, 0.00, False)
     
 
     start_time = time.time() 
 
     for i in range(1, rounds):
-
-        print(board)
 
         winner = game.play_round()
 
@@ -46,7 +46,7 @@ def run_cycle(rounds):
         elif winner == "T":
             ties += 1
 
-        print("\n")
+        #print("\n")
 
         board.reset()
     

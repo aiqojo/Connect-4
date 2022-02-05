@@ -12,6 +12,9 @@ class game_handler():
 
     def play_round(self):
 
+        if self.print:
+            print(self.board)
+
         winner = ''
 
         while True:
@@ -24,7 +27,7 @@ class game_handler():
             column_choice = self.ai_1.answer(self.board.find_empty_columns(), self.board)
 
             if self.print:
-                print("RED'S CHOICE IS: ", column_choice)
+                print("RED'S CHOICE IS:", column_choice)
 
             # If self.board.find_empty_columns() returns an empty list, ai_1.answer will return -1
             # This means there are no empty columns left, so a tie if a winner hasn't been found yet
@@ -59,7 +62,7 @@ class game_handler():
             column_choice = self.ai_2.answer(self.board.find_empty_columns(), self.board)
 
             if self.print:
-                print("YELLOW'S CHOICE IS: ", column_choice)
+                print("YELLOW'S CHOICE IS:", column_choice)
 
             if column_choice == -1:
                 if self.print:
