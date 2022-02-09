@@ -6,17 +6,17 @@ class Board:
     p1 = "X"
     p2 = "O"
 
-    def __init__(self, width, height, print):
-        self.width = width
-        self.height = height
+    def __init__(self, print):
+        self.width = 7
+        self.height = 6
         self.print = print
 
-        self.board = [['.']*width for x in range(height)]
+        self.board = [[' ']*self.width for x in range(self.height)]
 
     def reset(self):
         if self.print:
             print("-------NEW GAME-------")
-        self.board = [['.']*self.width for x in range(self.height)]
+        self.board = [[' ']*self.width for x in range(self.height)]
 
     def add_checker(self, color, column):
 
@@ -40,6 +40,8 @@ class Board:
             if not self.find_lowest(x) == -1:
                 arrr.append(x)
         
+
+        print("Column choices:", arrr)
         return arrr
 
     def get_location_color(self, row, column):
@@ -52,7 +54,7 @@ class Board:
         lowest = -1
 
         for x in reversed(range(self.height)):
-            if self.board[x][column] == '.':
+            if self.board[x][column] == ' ':
                 lowest = x
                 break
 

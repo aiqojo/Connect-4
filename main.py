@@ -20,16 +20,12 @@ def run_cycle(rounds):
     yellow_wins = 0
     ties = 0
 
-    width = 7
-    height = 6
-    sleep_time = 2
-
     colors = ["X", "O"]
 
-    board = Board(width, height, False)
+    board = Board(False)
     red = ai_handler("randosmart", colors, 0)
     yellow = ai_handler("randosmart", colors, 1)
-    game = game_handler(board, red, yellow, 0.00, False)
+    game = game_handler(board, red, yellow, .5, True)
     
 
     start_time = time.time() 
