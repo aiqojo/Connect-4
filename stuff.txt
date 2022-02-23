@@ -27,3 +27,93 @@ t1 = threading.Thread(target=run_cycle, args=(red_wins, yellow_wins, ties, i, Fa
             red_wins += f1_answer[0]
             yellow_wins += f1_answer[1]
             ties += f1_answer[2]
+
+# Old check win method in board
+
+
+    def check_win(self):
+
+        # If this hits -4, win for red (p1) "X"
+        # If this hits 4, win for yellow (p2) "O"
+        win_counter = 0
+
+        for row in reversed(range(3, self.HEIGHT)):
+            for column in range(self.WIDTH - 3):
+
+                # Checking each row
+                for x in range(4):
+                    for y in range(4):
+                        if self.board[row - x][column + y] == self.p1:
+                            win_counter -= 1
+                        elif self.board[row - x][column + y] == self.p2:
+                            win_counter += 1
+
+                    if self.counter_Check(win_counter) == self.p1:
+                        if self.print:
+                            print("Red (X) wins!")
+                        return True
+                    elif self.counter_Check(win_counter) == self.p2:
+                        if self.print:
+                            print("Yellow (O) wins!")
+                        return True
+                    
+                    win_counter = 0
+
+
+                # Checking each column
+                for x in range(4):
+                    for y in range(4):
+                        if self.board[row - y][column + x] == self.p1:
+                            win_counter -= 1
+                        elif self.board[row - y][column + x] == self.p2:
+                            win_counter += 1
+
+                    if self.counter_Check(win_counter) == self.p1:
+                        if self.print:
+                            print("Red (X) wins!")
+                        return True
+                    elif self.counter_Check(win_counter) == self.p2:
+                        if self.print:
+                            print("Yellow (O) wins!")
+                        return True
+                    win_counter = 0
+
+                win_counter = 0
+
+
+                # Checking the 2 diagonals
+                for x in range(4):
+                    if self.board[row - x][column + x] == self.p1:
+                        win_counter -= 1
+                    if self.board[row - x][column + x] == self.p2:
+                        win_counter += 1
+                
+                if self.counter_Check(win_counter) == self.p1:
+                    if self.print:
+                        print("Red (X) wins!")
+                    return True
+                elif self.counter_Check(win_counter) == self.p2:
+                    if self.print:
+                        print("Yellow (O) wins!")
+                    return True
+
+                win_counter = 0
+
+                for x in range(4):
+                    if self.board[row - 3 + x][column + x] == self.p1:
+                        win_counter -= 1
+                    if self.board[row - 3 + x][column + x] == self.p2:
+                        win_counter += 1
+
+                if self.counter_Check(win_counter) == self.p1:
+                    if self.print:
+                        print("Red (X) wins!")
+                    return True
+                elif self.counter_Check(win_counter) == self.p2:
+                    if self.print:
+                        print("Yellow (O) wins!")
+                    return True
+
+                win_counter = 0 
+
+        return False

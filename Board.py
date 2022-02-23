@@ -7,18 +7,19 @@ class Board:
     p2 = "O"
 
     def __init__(self, print):
-        self.width = 7
-        self.height = 6
+        self.WIDTH = 7
+        self.HEIGHT = 6
         self.print = print
 
-        self.board = [[' ']*self.width for x in range(self.height)]
+
+        self.board = [[' ']*self.WIDTH for x in range(self.HEIGHT)]
 
     def reset(self):
         if self.print:
             print("-------NEW GAME-------")
-        self.board = [[' ']*self.width for x in range(self.height)]
+        self.board = [[' ']*self.WIDTH for x in range(self.HEIGHT)]
 
-    def add_checker(self, color, column):
+    def add_piece(self, color, column):
 
         column = int(column)
 
@@ -33,15 +34,14 @@ class Board:
             return True
 
     def find_empty_columns(self):
-        arr = list(range(0, self.width))
+        arr = list(range(0, self.WIDTH))
         arrr = []
 
         for x in arr:
             if not self.find_lowest(x) == -1:
                 arrr.append(x)
         
-
-        print("Column choices:", arrr)
+        #print("Column choices:", arrr)
         return arrr
 
     def get_location_color(self, row, column):
@@ -53,7 +53,7 @@ class Board:
     def find_lowest(self, column):
         lowest = -1
 
-        for x in reversed(range(self.height)):
+        for x in reversed(range(self.HEIGHT)):
             if self.board[x][column] == ' ':
                 lowest = x
                 break
@@ -84,95 +84,142 @@ class Board:
         else:
             return ""
 
-    def check_win(self):
-
-        # If this hits -4, win for red (p1)
-        # If this hits 4, win for yellow (p2)
+    def check_win_optimized(self, column):
+        # Red goes first "X"
+        # Yellow goes second "O"
         win_counter = 0
+        row = self.find_lowest(column) + 1
+        color = self.board[row][column]
+        #print("Location:", row, column)
+        
+        # --------------------------
+        # ------- HORIZONTAL -------
+        # --------------------------
+        
+        # Just keep going left in this row until you get win_counter to 4 (it starts at 1 for the piece just placed)
+        # or you run into the opposite color
+        # Keeping track of the last column there was a correct color piece, you start going back the opposite way
+        # and see if there are 4 in a row going to the right
+        for i in range(column + 1,self.WIDTH):
+            if self.board[row][i] == color:
+                #print(row, i)
+                win_counter += 1
+            else:
+                break
+            # If we reach 3 here, there were 4 in a row going to the right with column being the right most piece
+            if win_counter == 3:
+                #print("WON HORIZONTAL TO RIGHT")
+                return True
 
-        for row in reversed(range(3, self.height)):
-            for column in range(self.width - 3):
+        # We headed left here starting from the square to the right of the original location
+        for i in reversed(range(0, column)):
+            if self.board[row][i] == color:
+                #print(row, i)
+                win_counter += 1
+            else:
+                break
+            if win_counter == 3:
+                #print("WON HORIZONTAL TO LEFT")
+                return True
+        
 
-                # Checking each row
-                for x in range(4):
-                    for y in range(4):
-                        if self.board[row - x][column + y] == self.p1:
-                            win_counter -= 1
-                        elif self.board[row - x][column + y] == self.p2:
-                            win_counter += 1
+        # ------------------------
+        # ------- VERTICAL -------
+        # ------------------------
 
-                    if self.counter_Check(win_counter) == self.p1:
-                        if self.print:
-                            print("Red (X) wins!")
-                        return True
-                    elif self.counter_Check(win_counter) == self.p2:
-                        if self.print:
-                            print("Yellow (O) wins!")
-                        return True
-                    
-                    win_counter = 0
-
-
-                # Checking each column
-                for x in range(4):
-                    for y in range(4):
-                        if self.board[row - y][column + x] == self.p1:
-                            win_counter -= 1
-                        elif self.board[row - y][column + x] == self.p2:
-                            win_counter += 1
-
-                    if self.counter_Check(win_counter) == self.p1:
-                        if self.print:
-                            print("Red (X) wins!")
-                        return True
-                    elif self.counter_Check(win_counter) == self.p2:
-                        if self.print:
-                            print("Yellow (O) wins!")
-                        return True
-                    win_counter = 0
-
-                win_counter = 0
+        win_counter = 0
+        # Same as above but instead we are looking down only in the specific column
+        # We start at the location below the original spot because we know that one is of the color
+        # we are looking for. This allows us to only have to look for win_counter to be 3
+        ii = min(row + 1, self.HEIGHT - 1)
+        while ii < self.HEIGHT:
+            if self.board[ii][column] == color:
+                #print(ii, column)
+                win_counter += 1
+            else:
+                break
+            if win_counter == 3:
+                #print("WON VERTICAL")
+                return True
+            ii += 1
 
 
-                # Checking the 2 diagonals
-                for x in range(4):
-                    if self.board[row - x][column + x] == self.p1:
-                        win_counter -= 1
-                    if self.board[row - x][column + x] == self.p2:
-                        win_counter += 1
+        # ------------------------
+        # ------- DIAGONAL -------
+        # ------------------------
+
+        # Capital X is the current piece placed
+        #X
+        # x
+        #  x
+        #   x
+        # This looks for the furthest you can either go down or to the right, and takes the minimum
+        # so we don't go out of bounds
+        furthest_distance_down_or_right = min(self.HEIGHT - row, self.WIDTH - column)
+        # Now we move on to check the diagonals
+        win_counter = 0
+        for i in range(1,furthest_distance_down_or_right):
+            if self.board[row + i][column + i] == color:
+                #print(row + i, column + i)
+                win_counter += 1
+            else:
+                break
+            if win_counter == 3:
+                #print("WON DIAGONAL DOWN AND RIGHT")
+                return True
+
+        # We now check from bottom right going up and left to see if there is a win in the opposite way
+        # We start at the last location checked
+        # We also don't need to do this loop if the previous check went down and right 3 spaces,
+        # because we would just be checking the same exact spots
+        win_counter == 0
+        furthest_distance_up_or_left = min(row, column)
+        for i in range(1, furthest_distance_up_or_left):
+            if self.board[row - i][column - i] == color:
+                #print(row - i, column - i)
+                win_counter += 1
+            else:
+                break
+            if win_counter == 3:
+                #print("WON DIAGONAL UP AND LEFT")
+                return True
+
+        # Now we have to check down and left
+        # Capital X is the current piece placed
+        #   X
+        #  x
+        # x
+        #x
                 
-                if self.counter_Check(win_counter) == self.p1:
-                    if self.print:
-                        print("Red (X) wins!")
-                    return True
-                elif self.counter_Check(win_counter) == self.p2:
-                    if self.print:
-                        print("Yellow (O) wins!")
-                    return True
+        furthest_distance_down_or_left = min(self.HEIGHT - row, column)
+        win_counter = 0
+        for i in range(1,furthest_distance_down_or_left):
+            if self.board[row + i][column - i] == color:
+                #print(row + i, column - i)
+                win_counter += 1
+            else:
+                break
+            if win_counter == 3:
+                #print("WON DIAGONAL DOWN AND LEFT")
+                return True
 
-                win_counter = 0
-
-                for x in range(4):
-                    if self.board[row - 3 + x][column + x] == self.p1:
-                        win_counter -= 1
-                    if self.board[row - 3 + x][column + x] == self.p2:
-                        win_counter += 1
-
-                if self.counter_Check(win_counter) == self.p1:
-                    if self.print:
-                        print("Red (X) wins!")
-                    return True
-                elif self.counter_Check(win_counter) == self.p2:
-                    if self.print:
-                        print("Yellow (O) wins!")
-                    return True
-
-                win_counter = 0 
-
+        # Now we checking from bottom left to up right
+        win_counter == 0
+        furthest_distance_up_or_left = min(row, self.WIDTH - column)
+        for i in range(1,furthest_distance_up_or_left):
+            if self.board[row - i][column + i] == color:
+                #print(row - i, column + i)
+                win_counter += 1
+            else:
+                break
+            if win_counter == 3:
+                #print("WON DIAGONAL UP AND LEFT")
+                return True
+        
         return False
 
     def get_height(self):
-            return self.height
+            return self.HEIGHT
 
     def get_width(self):
-        return self.width
+        return self.WIDTH

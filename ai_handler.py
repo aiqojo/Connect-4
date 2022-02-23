@@ -2,29 +2,23 @@ from random_ai import random_ai
 from time import sleep
 from player import player
 from randosmart_ai import randosmart_ai
+from miniminimax import miniminimax
 
 # random, 
-class ai_handler():
+class ai_handler:
     
-    def __init__(self, ai, colors, which_color):
+    def __init__(self, ai, color, depth):
         if ai == "player":
-            self.ai = player(colors[which_color])
+            self.ai = player(color)
         elif ai == "randy":
-            self.ai = random_ai(colors[which_color])
+            self.ai = random_ai(color)
         elif ai == "randosmart":
-            self.ai = randosmart_ai(colors[which_color])
-        self.timer = 0
-    
+            self.ai = randosmart_ai(color)
+        elif ai == "miniminimax":
+            self.ai = miniminimax(color, depth)
 
-    def answer(self, arr, board):
-        return self.ai.answer(arr, board)
-
-    # def set_timer(self, seconds):
-    #     self.seconds = seconds
-
-    # def check_timer(self):
-    #     if self.timer > 0:
-    #         sleep(self.timer)
-    #     else:
-    #         pass
-
+    def get_answer(self, arr, board):
+        if self.ai == "miniminimax":
+            return self.ai.answer(board)
+        else:
+            return self.ai.answer(arr, board)
