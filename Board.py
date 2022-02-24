@@ -33,12 +33,21 @@ class Board(object):
         if row == -1:
             return False
         else:
-            if self.print:
-                print("COLOR:", color, "ROW:", row, "COLUMN:", column)
+            # if self.print:
+            #     print("COLOR:", color, "ROW:", row, "COLUMN:", column)
             self.board_history += str(column)
             self.board[row,column] = color.upper()
             return True
 
+    def remove_piece(self,column):
+        row = self.find_lowest(column) + 1
+        if row >= 6:
+            return False
+        else:
+            # if self.print:
+            #     print("COLOR:", self.board[row,column], "ROW:", row, "COLUMN:", column)
+            self.board[row,column] = ' '
+            return True
 
     def find_empty_columns(self):
         arr = list(range(0, self.WIDTH))
@@ -66,7 +75,8 @@ class Board(object):
                 break
 
         if lowest == -1 and self.print:
-            print("Column " + str(column + 1) + " is full!")
+            #print("Column " + str(column + 1) + " is full!")
+            #print(self.board)
             return lowest
         elif lowest == -1:
             return lowest

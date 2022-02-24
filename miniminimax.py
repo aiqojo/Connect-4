@@ -2,6 +2,7 @@ import random
 from time import sleep
 from Board import Board
 from copy import deepcopy
+import numpy as np
 
 from numpy import Inf
 
@@ -14,16 +15,18 @@ class miniminimax:
             self.opposite_color = "O"
         else:
             self.opposite_color = "X"
-        self.print = True
+        self.print = False
 
-    # Takes in an array of empty columns on the boardm as well as the board
+    # Takes in the array of empty columns on the board as well as the board
     def answer(self, arr, board):
         best_column = 0
+        # The current best evaluation is set as -Inf so it can get overwritten by any other move
         best_val = -Inf
         # For each column in the board, start a recursive search for all 
         for column in board.find_empty_columns():
-            temp_board = deepcopy(board)
-            value = self.minimax(temp_board, self.depth, self.color, column)
+            board.add_piece(self.color, column)
+            value = self.minimax(board, self.depth, self.color, column)
+            board.remove_piece(column)
             if value > best_val:
                 best_val = value
                 best_column = column
@@ -41,55 +44,62 @@ class miniminimax:
 
 
     def minimax(self, board, depth, color, column):
+        empty_columns = board.find_empty_columns()
+        is_win = board.check_win_optimized(column)
+
         if self.print:
             sleep(.005)
             print("\n-------------------------")
             print("BOARD BELOW BEING CHECKED")
             print("DEPTH:", depth)
-            tb = deepcopy(board)
-            tb.add_piece(color, column)
-            print(tb)
+            print(board)
             print("COLUMN BEING CHECKED:", column)
-            print("BOARD WIN?", board.check_win_optimized(column))
+            print("BOARD WIN?", is_win)
+
         # If there are no more columns, its a tie, return 0
-        if len(board.find_empty_columns()) == 0:
+        if len(empty_columns) == 0:
             if self.print:
                 print("RETURNING 0, NO MORE COLUMNS")
             return 0
+
         # If the current color is this minimaxer's color, and there is a win, return 100 for win
-        elif depth == 0 and color == self.color and board.check_win_optimized(column):
+        elif depth == 0 and color == self.color and is_win:
             if self.print:
                 print("RETURNING 100, I WON")
             return 100
+
         # Else, the opponent won here, return -100
-        elif depth == 0 and color == self.opposite_color and board.check_win_optimized(column):
+        elif depth == 0 and color == self.opposite_color and is_win:
             if self.print:
                 print("RETURNING -100, I LOST")
             return -100
+
         # Otherwise, no information gained, report 0 back
         elif depth == 0:
             if self.print:
                 print("RETURNING 0, THERE WAS NO WIN FOR EITHER")
             return 0
+
         # It only enteres here as long as depth isn't 0
         else:
             if color == self.color:
                 bestVal = -Inf
-                for new_column in board.find_empty_columns():
-                    temp_board = deepcopy(board)
-                    temp_board.add_piece(self.color,column)
+                for new_column in empty_columns:
+                    board.add_piece(color, column)
                     if self.print:
-                        print("LOOKING AT LOCATION", temp_board.find_lowest(column), column)
-                    value = self.minimax(temp_board, depth-1, self.opposite_color, new_column)
+                        print("LOOKING AT LOCATION", board.find_lowest(column), column)
+                    value = self.minimax(board, depth-1, self.opposite_color, new_column)
+                    board.remove_piece(column)
                     bestVal = max(bestVal, value)
                 return bestVal
+
             else:
                 bestVal = Inf
-                for new_column in board.find_empty_columns():
-                    temp_board = deepcopy(board)
-                    temp_board.add_piece(self.opposite_color,column)
+                for new_column in empty_columns:
+                    board.add_piece(color, column)
                     if self.print:
                         print("NEWCOLUMN:",new_column)
-                    value = self.minimax(temp_board, depth-1, self.color, new_column)
+                    value = self.minimax(board, depth-1, self.color, new_column)
+                    board.remove_piece(column)
                     bestVal = min(bestVal, value)
                 return bestVal

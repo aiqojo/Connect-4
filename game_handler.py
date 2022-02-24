@@ -55,6 +55,8 @@ class game_handler():
             #     winner = 'X'
             #     break
 
+            # TODO: Add the ceck win to the bots, specifically make it so this only gets called if 
+            #       minimax knows it has won
             if self.board.check_win_optimized(column_choice):
                 if self.print:
                     print("Red (X) won!")
