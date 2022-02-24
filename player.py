@@ -11,7 +11,7 @@ class player:
 
         while not value in arr:
             imput = input("Enter column: ")
-            
+            print(imput)
             value = int(imput)
             print(value)
 

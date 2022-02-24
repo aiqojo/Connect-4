@@ -14,7 +14,8 @@ class game_handler():
     def play_round(self):
         
         if self.print and not self.first:
-            print("----NEW GAME----\n", self.board)
+            print("----NEW GAME----")
+            print(self.board)
         elif self.print:
             print(self.board)
         

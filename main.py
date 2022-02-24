@@ -25,16 +25,18 @@ def run_cycle(rounds):
     # Color can either be "X" for red, or "O" for yellow
 
     board = Board(False)
+    print(board)
+
     # player        -> ai_handler("player", color, 0)
     # randy         -> ai_handler("randy", color, 0)
     # randosmart    -> ai_handler("randosmart", color, 0)
     # miniminimax   -> ai_handler("miniminimax", color, depth)
     
     
-    red = ai_handler("miniminimax", "X", 10)
-    yellow = ai_handler("randy", "O", 0)
+    red = ai_handler("player", "X", 2)
+    yellow = ai_handler("player", "O", 0)
 
-    game = game_handler(board, red, yellow, 2, True)
+    game = game_handler(board, red, yellow, .25, True)
     
 
     start_time = time.time() 
