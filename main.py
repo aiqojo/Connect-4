@@ -20,8 +20,8 @@ def run_cycle(rounds):
     ties = 0
 
     # Set true or false if you want extra stuff printed into terminal
-    board = Board(True)
-    print(board)
+    board = Board(False)
+    #print(board)
 
     # player        -> ai_handler("player", color, 0)
     # randy         -> ai_handler("randy", color, 0)
@@ -29,13 +29,13 @@ def run_cycle(rounds):
     # miniminimax   -> ai_handler("miniminimax", color, depth)
     
     # Color can either be "X" for red, or "O" for yellow
-    red = ai_handler("miniminimax", "X", 5)
-    yellow = ai_handler("miniminimax", "O", 5)
+    red = ai_handler("miniminimax", "X", 3)
+    yellow = ai_handler("miniminimax", "O", 3)
 
     # The 4th parameter is time between rounds
     # Set from .25-2 seconds for ease of viewing, otherwise set to 0
     # Last parameter is for having it print into the terminal
-    game = game_handler(board, red, yellow, 2, True)
+    game = game_handler(board, red, yellow, 0, False)
     
     start_time = time.time() 
 
@@ -53,7 +53,7 @@ def run_cycle(rounds):
         # If I wanted to, I could also decide to save stuff to a file here in future
         board.reset()
     
-        if i % 1000 == 0 and i != 0:
+        if i % 10 == 0 and i != 0:
             epoch_count += 1
             epoch_time = time.time()
             print("ITERATION:", i, "VALUES:", red_wins, yellow_wins, ties)

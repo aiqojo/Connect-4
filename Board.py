@@ -26,44 +26,6 @@ class Board(object):
     def get_board_state(self):
         return self.board_history
 
-
-    def add_piece(self, color, column):
-        column = int(column)
-        row = self.find_lowest(column)
-        if row == -1:
-            return False
-        else:
-            # if self.print:
-            #     print("COLOR:", color, "ROW:", row, "COLUMN:", column)
-            self.board_history += str(column)
-            self.board[row,column] = color.upper()
-            return True
-
-    def remove_piece(self,column):
-        row = self.find_lowest(column) + 1
-        if row >= 6:
-            return False
-        else:
-            # if self.print:
-            #     print("COLOR:", self.board[row,column], "ROW:", row, "COLUMN:", column)
-            self.board[row,column] = ' '
-            return True
-
-    def find_empty_columns(self):
-        arr = list(range(0, self.WIDTH))
-        arrr = []
-
-        for x in arr:
-            if not self.find_lowest(x) == -1:
-                arrr.append(x)
-        #print("Column choices:", arrr)
-        return arrr
-
-
-    def get_location_color(self, row, column):
-        return self.board[row,column]
-
-
     # Find lowest
     # If lowest isn't found, return -1, as nothing can be placed in that row
     def find_lowest(self, column):
@@ -82,16 +44,58 @@ class Board(object):
             return lowest
         else:
             return lowest
+
+
+    def add_piece(self, color, column):
+        column = int(column)
+        row = self.find_lowest(column)
+        if row == -1:
+            return False
+        else:
+            # if self.print:
+            #     print("COLOR:", color, "ROW:", row, "COLUMN:", column)
+            #self.board_history += str(column)
+            self.board[row,column] = color.upper()
+            return True
+
+
+    def remove_piece(self,column):
+        row = self.find_lowest(column) + 1
+        if row >= 6:
+            return False
+        else:
+            # if self.print:
+            #     print("COLOR:", self.board[row,column], "ROW:", row, "COLUMN:", column)
+            self.board[row,column] = ' '
+            return True
+
+
+    def find_empty_columns(self):
+        arr = list(range(0, self.WIDTH))
+        arrr = []
+
+        for x in arr:
+            if self.board[0, x] == ' ':
+                arrr.append(x)
+        #print("Column choices:", arrr)
+        return arrr
+
+
+    def get_location_color(self, row, column):
+        return self.board[row,column]
+
     
     def __repr__(self):
         for row in self.board:
             print(row)
         return ''
 
+
     def __str__(self):
         for row in self.board:
             print(row)
         return ''
+
 
     def counter_Check(self, win_counter):
         if win_counter == -4:
@@ -100,6 +104,7 @@ class Board(object):
             return self.p2
         else:
             return ""
+
 
     def check_win_optimized(self, column):
         # Red goes first "X"
@@ -251,3 +256,4 @@ class Board(object):
 
     def get_width(self):
         return self.WIDTH
+        
