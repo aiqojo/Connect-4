@@ -1,5 +1,4 @@
 from Board import *
-from Zobrist import Zobrist
 from ai_handler import ai_handler
 from game_handler import game_handler
 import time
@@ -8,7 +7,7 @@ import time
 #randoprodigy
 
 def main():
-    run_cycle(40)
+    run_cycle(10)
 
 def run_cycle(rounds):
 
@@ -21,7 +20,7 @@ def run_cycle(rounds):
 
     # Set true or false if you want extra stuff printed into terminal
     board = Board(False)
-    zobrist = Zobrist()
+    #print(board.zArray)
 
     # player        -> ai_handler("player", color, 0)
     # randy         -> ai_handler("randy", color, 0)
@@ -29,13 +28,13 @@ def run_cycle(rounds):
     # miniminimax   -> ai_handler("miniminimax", color, depth)
     
     # Color can either be "X" for red, or "O" for yellow
-    red = ai_handler("miniminimax", "X", 4)
-    yellow = ai_handler("miniminimax", "O", 4)
+    red = ai_handler("miniminimax", "X", 5)
+    yellow = ai_handler("miniminimax", "O", 5)
 
     # The 4th parameter is time between rounds
     # Set from .25-2 seconds for ease of viewing, otherwise set to 0
     # Last parameter is for having it print into the terminal
-    game = game_handler(board, red, yellow, 0, False)
+    game = game_handler(board, red, yellow, .1, True)
     
     total_start_time = time.time()
     start_time = time.time() 
@@ -65,7 +64,7 @@ def run_cycle(rounds):
             print("AVERAGE EPOCH TIME:", epoch_total_time/epoch_count)
 
             start_time = time.time()
-                
+            
 
     print("FINAL:", red_wins, yellow_wins, ties)
     total_end_time = time.time()

@@ -18,13 +18,14 @@ class miniminimax:
         self.delay = .01
         self.answer_count = 0
         self.minimax_count = 0
+        self.hash_table_count = 0
         self.board_table = {}
 
     # Method to return the final answer of the minimax
     # Takes in arr of empty columns for random choice at end
     # Takes in board which it will directly manipulate as it searches for answer
     def answer(self, arr, board):
-        self.board_table = {}
+        self.board_table.clear()
 
         self.answer_count += 1
         # These lists will hold the most optimal next moves and return a random one at the end
@@ -56,6 +57,8 @@ class miniminimax:
             elif value == choices_values:
                 choices.append(column)
 
+        print("HASH TABLE COUNT:", self.hash_table_count)
+
         if next_turn_win_choices:
             return random.choice(next_turn_win_choices)
         elif choices:
@@ -63,8 +66,9 @@ class miniminimax:
 
 
     def minimax(self, board, depth, color):
-        cur_hash = board.__hash__()
+        cur_hash = board.zHash
         if cur_hash in self.board_table:
+            self.hash_table_count += 1
             return self.board_table[cur_hash]
 
         self.minimax_count += 1

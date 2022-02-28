@@ -1,4 +1,5 @@
 #board[row][column]
+import sys
 import numpy as np
 
 class Board(object):
@@ -15,7 +16,9 @@ class Board(object):
         self.board[:] = ' '
         self.lowest_row = np.full((1,7), 5)
         
-        self.zArray = np.random.randint(sys.maxsize, size=(2,6,7), dtype=np.uint64)
+        # Randomly initialized an int64 that will be used for the zobrist hashing
+        self.zArray = np.random.randint(sys.maxsize, size=(6,7,2), dtype=np.uint64)
+        self.zHash = 0
 
         self.board_history = ''
 
@@ -33,18 +36,6 @@ class Board(object):
         self.board_history = ''
         self.lowest_row = np.full((1,7), 5)
 
-    def __key(self):
-        pass
-        #return key
-
-    def __hash__(self):
-        return hash(self.__key())
-
-    def __eq__(self, other):
-        if isinstance(other, Board):
-            return self.__key() == other.__key()
-        return NotImplemented
-
 
     def get_board_state(self):
         return self.board_history
@@ -60,6 +51,12 @@ class Board(object):
         else:
             self.board[row,column] = color.upper()
             self.lowest_row[0,column] -= 1
+
+            #Zobrist hashing stuff
+            if color == "X":
+                self.zHash ^= int(self.zArray[row,column,0])
+            else:
+                self.zHash ^= int(self.zArray[row,column,1])
             return True
 
     def remove_piece(self,column):
@@ -70,6 +67,12 @@ class Board(object):
         else:
             self.board[row,column] = ' '
             self.lowest_row[0,column] += 1
+            color = self.board[row,column]
+            #Zobrist hashing stuff
+            if color == "X":
+                self.zHash ^= int(self.zArray[row,column,0])
+            else:
+                self.zHash ^= int(self.zArray[row,column,1])
             return True
 
 

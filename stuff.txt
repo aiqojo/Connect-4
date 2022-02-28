@@ -193,3 +193,27 @@ def minimax(self, board, depth, color, column):
     #         #self.board_history += str(column)
     #         self.board[row,column] = color.upper()
     #         return True
+
+    # def generate_zobrist(self):
+    #     hash = 0
+    #     for i in range(self.board):
+    #         for j in range(i):
+    #             if self.board[i,j] == " ":
+    #                 hash ^= self.zArray[i,j,3]
+    #             elif self.board[i,j] == "X":
+    #                 hash ^= self.zArray[i,j,2]
+    #             else:
+    #                 hash ^= self.zArray[i,j,3]
+    #     return hash
+
+    # def __key(self):
+    #     pass
+    #     #return key
+
+    # def __hash__(self):
+    #     return hash(self.__key())
+
+    # def __eq__(self, other):
+    #     if isinstance(other, Board):
+    #         return self.__key() == other.__key()
+    #     return NotImplemented
