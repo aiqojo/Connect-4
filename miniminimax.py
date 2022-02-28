@@ -16,11 +16,17 @@ class miniminimax:
             self.opposite_color = "X"
         self.print = False
         self.delay = .01
+        self.answer_count = 0
+        self.minimax_count = 0
+        self.board_table = {}
 
     # Method to return the final answer of the minimax
     # Takes in arr of empty columns for random choice at end
     # Takes in board which it will directly manipulate as it searches for answer
     def answer(self, arr, board):
+        self.board_table = {}
+
+        self.answer_count += 1
         # These lists will hold the most optimal next moves and return a random one at the end
         next_turn_win_choices = []
         choices = []
@@ -57,6 +63,11 @@ class miniminimax:
 
 
     def minimax(self, board, depth, color):
+        cur_hash = board.__hash__()
+        if cur_hash in self.board_table:
+            return self.board_table[cur_hash]
+
+        self.minimax_count += 1
         if self.print:
             sleep(self.delay)
 
@@ -66,6 +77,7 @@ class miniminimax:
         if depth == 0:
             if self.print:
                 print("NO INFO GAINED, RETURN 0")
+            self.board_table[cur_hash] = DEFAULT_SCORE
             return DEFAULT_SCORE
         
         # Or if there are no more empty columns, return default score, it's a tie
@@ -74,6 +86,7 @@ class miniminimax:
         if not empty_columns:
             if self.print:
                 print("NO MORE COLUMNS LEFT, RETURN 0")
+            self.board_table[cur_hash] = DEFAULT_SCORE
             return DEFAULT_SCORE
         
         if color == self.color:
@@ -96,10 +109,12 @@ class miniminimax:
                 if color == self.color:
                     if self.print:
                         print("I WON, RETURN 100", depth)
+                    self.board_table[cur_hash] = WIN_SCORE
                     return WIN_SCORE
                 else:
                     if self.print:
                         print("I LOST RETURN -100", depth)
+                    self.board_table[cur_hash] = LOSE_SCORE
                     return LOSE_SCORE
 
             if color == self.color:

@@ -180,3 +180,16 @@ def minimax(self, board, depth, color, column):
                     board.remove_piece(column)
                     bestVal = min(bestVal, value)
                 return bestVal
+
+    # def add_piece(self, color, column):
+    #     self.add_piece_count += 1
+    #     column = int(column)
+    #     row = self.find_lowest(column)
+    #     if row == -1:
+    #         return False
+    #     else:
+    #         # if self.print:
+    #         #     print("COLOR:", color, "ROW:", row, "COLUMN:", column)
+    #         #self.board_history += str(column)
+    #         self.board[row,column] = color.upper()
+    #         return True

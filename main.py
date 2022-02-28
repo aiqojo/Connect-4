@@ -1,4 +1,5 @@
 from Board import *
+from Zobrist import Zobrist
 from ai_handler import ai_handler
 from game_handler import game_handler
 import time
@@ -7,11 +8,10 @@ import time
 #randoprodigy
 
 def main():
-    run_cycle(1000000)
+    run_cycle(40)
 
 def run_cycle(rounds):
 
-    total_start_time = time.time()
     epoch_total_time = 0
     epoch_count = 0
 
@@ -21,7 +21,7 @@ def run_cycle(rounds):
 
     # Set true or false if you want extra stuff printed into terminal
     board = Board(False)
-    #print(board)
+    zobrist = Zobrist()
 
     # player        -> ai_handler("player", color, 0)
     # randy         -> ai_handler("randy", color, 0)
@@ -29,14 +29,15 @@ def run_cycle(rounds):
     # miniminimax   -> ai_handler("miniminimax", color, depth)
     
     # Color can either be "X" for red, or "O" for yellow
-    red = ai_handler("miniminimax", "X", 3)
-    yellow = ai_handler("miniminimax", "O", 3)
+    red = ai_handler("miniminimax", "X", 4)
+    yellow = ai_handler("miniminimax", "O", 4)
 
     # The 4th parameter is time between rounds
     # Set from .25-2 seconds for ease of viewing, otherwise set to 0
     # Last parameter is for having it print into the terminal
     game = game_handler(board, red, yellow, 0, False)
     
+    total_start_time = time.time()
     start_time = time.time() 
 
     for i in range(1, rounds + 1):
@@ -51,9 +52,11 @@ def run_cycle(rounds):
             ties += 1
 
         # If I wanted to, I could also decide to save stuff to a file here in future
+        #print(board)
+        #print(board.__hash__())
         board.reset()
     
-        if i % 10 == 0 and i != 0:
+        if i % 1 == 0 and i != 0:
             epoch_count += 1
             epoch_time = time.time()
             print("ITERATION:", i, "VALUES:", red_wins, yellow_wins, ties)
@@ -66,7 +69,14 @@ def run_cycle(rounds):
 
     print("FINAL:", red_wins, yellow_wins, ties)
     total_end_time = time.time()
-    print(total_end_time - total_start_time)
+    print("TOTAL TIME:",total_end_time - total_start_time)
+
+
+    print("ap:", board.add_piece_count, "\nrp:", board.remove_piece_count, "\nfe:", \
+        board.find_empty_columns_count, "\ncw:", board.check_win_optimized_count)
+    print("red minimax calls:", red.ai.minimax_count)
+    print("yellow minimax calls:", yellow.ai.minimax_count)
+
     return red_wins, yellow_wins, ties
 
 if __name__ == "__main__":
