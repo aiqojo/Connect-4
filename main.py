@@ -29,13 +29,13 @@ def run_cycle(rounds):
     # miniminimax   -> ai_handler("miniminimax", color, depth)
     
     # Color can either be "X" for red, or "O" for yellow
-    red = ai_handler("miniminimax", "X", 5)
-    yellow = ai_handler("miniminimax", "O", 5)
+    red = ai_handler("player", "X", 2)
+    yellow = ai_handler("miniminimax", "O", 2)
 
     # The 4th parameter is time between rounds
     # Set from .25-2 seconds for ease of viewing, otherwise set to 0
     # Last parameter is for having it print into the terminal
-    game = game_handler(board, red, yellow, 2, True)
+    game = game_handler(board, red, yellow, 1, True)
     
     start_time = time.time() 
 

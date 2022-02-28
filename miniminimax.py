@@ -3,20 +3,22 @@ from time import sleep
 from Board import Board
 from copy import deepcopy
 import numpy as np
-
 from numpy import Inf
 
 class miniminimax:
 
     def __init__(self, color, depth):
         self.color = color
-        self.depth = depth
+        self.depth = depth - 1
         if color == "X":
             self.opposite_color = "O"
         else:
             self.opposite_color = "X"
-        self.print = False
+        self.print = True
+    
 
+    # Takes in a board
+    # 
     # Takes in the array of empty columns on the board as well as the board
     def answer(self, arr, board):
         best_column = 0
@@ -25,8 +27,13 @@ class miniminimax:
         # For each column in the board, start a recursive search for all 
         for column in board.find_empty_columns():
             board.add_piece(self.color, column)
+            if self.print:
+                print("LOOKING AT LOCATION", board.find_lowest(column), column)
+                print(board)
             value = self.minimax(board, self.depth, self.color, column)
-            board.remove_piece(column)
+            remove = board.remove_piece(column)
+            if not remove:
+                print("REMOVE DIDN'T WORK")
             if value > best_val:
                 best_val = value
                 best_column = column
@@ -36,11 +43,20 @@ class miniminimax:
             if self.print:
                 print("THERE WAS NO GOOD CHOICE PICKING RANDOM")
             return random.choice(arr)
+        elif best_val == -Inf:
+            return -1
         # Otherwise, there was a win, send that through
         else:
             if self.print:
-                print("I SAW A WIN! IT STARTS AT COLUMN: ", best_column)
+                print("I SAW A WIN! IT STARTS AT COLUMN:", best_column)
             return best_column
+
+
+
+
+
+
+
 
 
     def minimax(self, board, depth, color, column):
@@ -48,7 +64,7 @@ class miniminimax:
         is_win = board.check_win_optimized(column)
 
         if self.print:
-            sleep(.005)
+            sleep(.5)
             print("\n-------------------------")
             print("BOARD BELOW BEING CHECKED")
             print("DEPTH:", depth)
@@ -85,21 +101,26 @@ class miniminimax:
             if color == self.color:
                 bestVal = -Inf
                 for new_column in empty_columns:
-                    board.add_piece(color, column)
+                    board.add_piece(self.color, column)
                     if self.print:
-                        print("LOOKING AT LOCATION", board.find_lowest(column), column)
+                        print("LOOKING AT LOCATION", board.find_lowest(column) + 1, column)
+                        print(board)
                     value = self.minimax(board, depth-1, self.opposite_color, new_column)
-                    board.remove_piece(column)
+                    remove = board.remove_piece(column)
+                    if not remove:
+                        print("REMOVE DIDN'T WORK")
                     bestVal = max(bestVal, value)
                 return bestVal
-
             else:
                 bestVal = Inf
                 for new_column in empty_columns:
-                    board.add_piece(color, column)
+                    board.add_piece(self.opposite_color, column)
                     if self.print:
-                        print("NEWCOLUMN:",new_column)
+                        print("LOOKING AT LOCATION", board.find_lowest(column), column)
+                        print(board)
                     value = self.minimax(board, depth-1, self.color, new_column)
-                    board.remove_piece(column)
+                    remove = board.remove_piece(column)
+                    if not remove:
+                        print("REMOVE DIDN'T WORK")
                     bestVal = min(bestVal, value)
                 return bestVal
