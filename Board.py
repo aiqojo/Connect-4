@@ -13,8 +13,17 @@ class Board(object):
 
         self.board = np.empty((6,7), dtype='str')
         self.board[:] = ' '
+        self.lowest_row = np.full((1,7), 5)
+        
+        self.zArray = np.random.randint(sys.maxsize, size=(2,6,7), dtype=np.uint64)
+
         self.board_history = ''
 
+        self.find_lowest_count = 0
+        self.add_piece_count = 0
+        self.remove_piece_count = 0
+        self.find_empty_columns_count = 0
+        self.check_win_optimized_count = 0
 
     def reset(self):
         if self.print:
@@ -22,39 +31,55 @@ class Board(object):
         self.board = np.zeros((6,7), dtype='str')
         self.board[:] = ' '
         self.board_history = ''
+        self.lowest_row = np.full((1,7), 5)
+
+    def __key(self):
+        pass
+        #return key
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        if isinstance(other, Board):
+            return self.__key() == other.__key()
+        return NotImplemented
+
 
     def get_board_state(self):
         return self.board_history
 
 
     def add_piece(self, color, column):
-        column = int(column)
-        row = self.find_lowest(column)
+        #print(self.lowest_row)
+        self.add_piece_count += 1
+        #column = int(column)
+        row = self.lowest_row[0,column]
         if row == -1:
             return False
         else:
-            # if self.print:
-            #     print("COLOR:", color, "ROW:", row, "COLUMN:", column)
-            self.board_history += str(column)
             self.board[row,column] = color.upper()
+            self.lowest_row[0,column] -= 1
             return True
 
     def remove_piece(self,column):
-        row = self.find_lowest(column) + 1
-        if row >= 6:
+        self.remove_piece_count += 1
+        row = self.lowest_row[0,column] + 1
+        if row > 5:
             return False
         else:
-            # if self.print:
-            #     print("COLOR:", self.board[row,column], "ROW:", row, "COLUMN:", column)
             self.board[row,column] = ' '
+            self.lowest_row[0,column] += 1
             return True
 
+
     def find_empty_columns(self):
+        self.find_empty_columns_count += 1
         arr = list(range(0, self.WIDTH))
         arrr = []
 
         for x in arr:
-            if not self.find_lowest(x) == -1:
+            if self.board[0, x] == ' ':
                 arrr.append(x)
         #print("Column choices:", arrr)
         return arrr
@@ -63,35 +88,18 @@ class Board(object):
     def get_location_color(self, row, column):
         return self.board[row,column]
 
-
-    # Find lowest
-    # If lowest isn't found, return -1, as nothing can be placed in that row
-    def find_lowest(self, column):
-        lowest = -1
-
-        for x in reversed(range(self.HEIGHT)):
-            if self.board[x,column] == ' ':
-                lowest = x
-                break
-
-        if lowest == -1 and self.print:
-            #print("Column " + str(column + 1) + " is full!")
-            #print(self.board)
-            return lowest
-        elif lowest == -1:
-            return lowest
-        else:
-            return lowest
     
     def __repr__(self):
         for row in self.board:
             print(row)
         return ''
 
+
     def __str__(self):
         for row in self.board:
             print(row)
         return ''
+
 
     def counter_Check(self, win_counter):
         if win_counter == -4:
@@ -101,11 +109,13 @@ class Board(object):
         else:
             return ""
 
+
     def check_win_optimized(self, column):
+        self.check_win_optimized_count += 1
         # Red goes first "X"
         # Yellow goes second "O"
         win_counter = 0
-        row = self.find_lowest(column) + 1
+        row = self.lowest_row[0,column] + 1
         # If the column selected has no pieces in it already it will attempt to look out of bounds,
         # one below the lowest row, so I just return false here as there is no piece here to check
         if row == 6:
@@ -182,10 +192,10 @@ class Board(object):
         #   x
         # This looks for the furthest you can either go down or to the right, and takes the minimum
         # so we don't go out of bounds
-        furthest_distance_down_or_right = min(self.HEIGHT - row, self.WIDTH - column)
+        furthest_distance = min(self.HEIGHT - row, self.WIDTH - column)
         # Now we move on to check the diagonals
         win_counter = 0
-        for i in range(1,furthest_distance_down_or_right):
+        for i in range(1,furthest_distance):
             if self.board[row + i,column + i] == color:
                 #print(row + i, column + i)
                 win_counter += 1
@@ -199,9 +209,8 @@ class Board(object):
         # We start at the last location checked
         # We also don't need to do this loop if the previous check went down and right 3 spaces,
         # because we would just be checking the same exact spots
-        win_counter == 0
-        furthest_distance_up_or_left = min(row, column)
-        for i in range(1, furthest_distance_up_or_left):
+        furthest_distance = min(row, column) + 1
+        for i in range(1, furthest_distance):
             if self.board[row - i,column - i] == color:
                 #print(row - i, column - i)
                 win_counter += 1
@@ -217,13 +226,15 @@ class Board(object):
         #  x
         # x
         #x
-                
-        furthest_distance_down_or_left = min(self.HEIGHT - row, column)
+        
+        furthest_distance = min(self.HEIGHT - row - 1, column) + 1
         win_counter = 0
-        for i in range(1,furthest_distance_down_or_left):
+
+        for i in range(1,furthest_distance):
+            #print(row + i, column - i)
             if self.board[row + i,column - i] == color:
-                #print(row + i, column - i)
                 win_counter += 1
+                #print("COLOR",row + i, column - i, win_counter)
             else:
                 break
             if win_counter == 3:
@@ -231,12 +242,13 @@ class Board(object):
                 return True
 
         # Now we checking from bottom left to up right
-        win_counter == 0
-        furthest_distance_up_or_left = min(row, self.WIDTH - column)
-        for i in range(1,furthest_distance_up_or_left):
+
+        furthest_distance = min(row, self.WIDTH - column - 1) + 1
+        for i in range(1,furthest_distance):
+            #print(row - i, column + i)
             if self.board[row - i,column + i] == color:
-                #print(row - i, column + i)
                 win_counter += 1
+                #print("COLOR ",row - i, column + i, win_counter)
             else:
                 break
             if win_counter == 3:
@@ -251,3 +263,4 @@ class Board(object):
 
     def get_width(self):
         return self.WIDTH
+        

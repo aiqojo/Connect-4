@@ -117,3 +117,79 @@ t1 = threading.Thread(target=run_cycle, args=(red_wins, yellow_wins, ties, i, Fa
                 win_counter = 0 
 
         return False
+
+
+
+def minimax(self, board, depth, color, column):
+        empty_columns = board.find_empty_columns()
+        is_win = board.check_win_optimized(column)
+
+        if self.print:
+            sleep(.005)
+            print("\n-------------------------")
+            print("BOARD BELOW BEING CHECKED")
+            print("DEPTH:", depth)
+            print(board)
+            print("COLUMN BEING CHECKED:", column)
+            print("BOARD WIN?", is_win)
+
+        # If there are no more columns, its a tie, return 0
+        if len(empty_columns) == 0:
+            if self.print:
+                print("RETURNING 0, NO MORE COLUMNS")
+            return 0
+
+        # If the current color is this minimaxer's color, and there is a win, return 100 for win
+        elif depth == 0 and color == self.color and is_win:
+            if self.print:
+                print("RETURNING 100, I WON")
+            return 100
+
+        # Else, the opponent won here, return -100
+        elif depth == 0 and color == self.opposite_color and is_win:
+            if self.print:
+                print("RETURNING -100, I LOST")
+            return -100
+
+        # Otherwise, no information gained, report 0 back
+        elif depth == 0:
+            if self.print:
+                print("RETURNING 0, THERE WAS NO WIN FOR EITHER")
+            return 0
+
+        # It only enteres here as long as depth isn't 0
+        else:
+            if color == self.color:
+                bestVal = -Inf
+                for new_column in empty_columns:
+                    board.add_piece(color, column)
+                    if self.print:
+                        print("LOOKING AT LOCATION", board.find_lowest(column), column)
+                    value = self.minimax(board, depth-1, self.opposite_color, new_column)
+                    board.remove_piece(column)
+                    bestVal = max(bestVal, value)
+                return bestVal
+
+            else:
+                bestVal = Inf
+                for new_column in empty_columns:
+                    board.add_piece(color, column)
+                    if self.print:
+                        print("NEWCOLUMN:",new_column)
+                    value = self.minimax(board, depth-1, self.color, new_column)
+                    board.remove_piece(column)
+                    bestVal = min(bestVal, value)
+                return bestVal
+
+    # def add_piece(self, color, column):
+    #     self.add_piece_count += 1
+    #     column = int(column)
+    #     row = self.find_lowest(column)
+    #     if row == -1:
+    #         return False
+    #     else:
+    #         # if self.print:
+    #         #     print("COLOR:", color, "ROW:", row, "COLUMN:", column)
+    #         #self.board_history += str(column)
+    #         self.board[row,column] = color.upper()
+    #         return True

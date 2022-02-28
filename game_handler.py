@@ -30,23 +30,27 @@ class game_handler():
             if self.print:
                 print("Red's turn! (X)")
             #column_choice = input("Enter column: ")
+
+            if not self.board.find_empty_columns():
+                if self.print:
+                    print("WE HAVE TIED")
+                winner = "T"
+                break
+
             column_choice = self.red.get_answer(self.board.find_empty_columns(), self.board)
 
             if self.print:
                 print("RED'S CHOICE IS:", column_choice)
 
-            # If self.board.find_empty_columns() returns an empty list, red.answer will return -1
-            # This means there are no empty columns left, so a tie if a winner hasn't been found yet
-            if column_choice == -1:
+            if not self.board.find_empty_columns():
                 if self.print:
                     print("WE HAVE TIED")
                 winner = "T"
                 break
-            else:
-                # If the board isn't full yet, put the piece in its column
-                self.board.add_piece("X", column_choice)
-                if self.print:
-                    print(self.board)
+
+            self.board.add_piece("X", column_choice)
+            if self.print:
+                print(self.board)
 
             # Now check if there is a win, if so it must be red cause they just placed a piece
             # if self.board.check_win():
@@ -70,6 +74,13 @@ class game_handler():
             # Same as above, just yellow's turn now
             if self.print:
                 print("Yellow's turn! (O)")
+
+            if not self.board.find_empty_columns():
+                if self.print:
+                    print("WE HAVE TIED")
+                winner = "T"
+                break
+
             #column_choice = input("Enter column: ")
             column_choice = self.yellow.get_answer(self.board.find_empty_columns(), self.board)
 

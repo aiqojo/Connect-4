@@ -1,126 +1,145 @@
 import random
 from time import sleep
 from Board import Board
-from copy import deepcopy
 import numpy as np
+
 from numpy import Inf
 
 class miniminimax:
 
     def __init__(self, color, depth):
         self.color = color
-        self.depth = depth - 1
+        self.depth = depth
         if color == "X":
             self.opposite_color = "O"
         else:
             self.opposite_color = "X"
-        self.print = True
-    
+        self.print = False
+        self.delay = .01
+        self.answer_count = 0
+        self.minimax_count = 0
+        self.board_table = {}
 
-    # Takes in a board
-    # 
-    # Takes in the array of empty columns on the board as well as the board
+    # Method to return the final answer of the minimax
+    # Takes in arr of empty columns for random choice at end
+    # Takes in board which it will directly manipulate as it searches for answer
     def answer(self, arr, board):
-        best_column = 0
+        self.board_table = {}
+
+        self.answer_count += 1
+        # These lists will hold the most optimal next moves and return a random one at the end
+        next_turn_win_choices = []
+        choices = []
+
         # The current best evaluation is set as -Inf so it can get overwritten by any other move
-        best_val = -Inf
-        # For each column in the board, start a recursive search for all 
-        for column in board.find_empty_columns():
+        choices_values = -Inf
+
+        # Now, send the board and its current state into the minimax function
+        for column in arr:
             board.add_piece(self.color, column)
-            if self.print:
-                print("LOOKING AT LOCATION", board.find_lowest(column), column)
-                print(board)
-            value = self.minimax(board, self.depth, self.color, column)
-            remove = board.remove_piece(column)
-            if not remove:
-                print("REMOVE DIDN'T WORK")
-            if value > best_val:
-                best_val = value
-                best_column = column
-        
-        # If the best eveluation was 0, there are no wins within the depth checked, so just pick random one
-        if best_val == 0:
-            if self.print:
-                print("THERE WAS NO GOOD CHOICE PICKING RANDOM")
-            return random.choice(arr)
-        elif best_val == -Inf:
-            return -1
-        # Otherwise, there was a win, send that through
-        else:
-            if self.print:
-                print("I SAW A WIN! IT STARTS AT COLUMN:", best_column)
-            return best_column
+            is_win = board.check_win_optimized(column)
+            
+            if is_win:
+                board.remove_piece(column)
+                if self.print:
+                    print("I HAVE AN ANSWER:", column)
+                next_turn_win_choices.append(column)
+                continue
+            
+            value = self.minimax(board, self.depth, self.opposite_color)
+            board.remove_piece(column)
+
+            if value > choices_values:
+                choices.clear()
+                choices_values = value
+                choices.append(column)
+            elif value == choices_values:
+                choices.append(column)
+
+        if next_turn_win_choices:
+            return random.choice(next_turn_win_choices)
+        elif choices:
+            return random.choice(choices)
 
 
+    def minimax(self, board, depth, color):
+        cur_hash = board.__hash__()
+        if cur_hash in self.board_table:
+            return self.board_table[cur_hash]
 
-
-
-
-
-
-
-    def minimax(self, board, depth, color, column):
-        empty_columns = board.find_empty_columns()
-        is_win = board.check_win_optimized(column)
-
+        self.minimax_count += 1
         if self.print:
-            sleep(.5)
-            print("\n-------------------------")
-            print("BOARD BELOW BEING CHECKED")
-            print("DEPTH:", depth)
-            print(board)
-            print("COLUMN BEING CHECKED:", column)
-            print("BOARD WIN?", is_win)
+            sleep(self.delay)
 
-        # If there are no more columns, its a tie, return 0
-        if len(empty_columns) == 0:
+        DEFAULT_SCORE = 0
+
+        # If at 0 depth and here, no information was gained, return default score
+        if depth == 0:
             if self.print:
-                print("RETURNING 0, NO MORE COLUMNS")
-            return 0
-
-        # If the current color is this minimaxer's color, and there is a win, return 100 for win
-        elif depth == 0 and color == self.color and is_win:
+                print("NO INFO GAINED, RETURN 0")
+            self.board_table[cur_hash] = DEFAULT_SCORE
+            return DEFAULT_SCORE
+        
+        # Or if there are no more empty columns, return default score, it's a tie
+        empty_columns = board.find_empty_columns()
+        #print(empty_columns)
+        if not empty_columns:
             if self.print:
-                print("RETURNING 100, I WON")
-            return 100
-
-        # Else, the opponent won here, return -100
-        elif depth == 0 and color == self.opposite_color and is_win:
-            if self.print:
-                print("RETURNING -100, I LOST")
-            return -100
-
-        # Otherwise, no information gained, report 0 back
-        elif depth == 0:
-            if self.print:
-                print("RETURNING 0, THERE WAS NO WIN FOR EITHER")
-            return 0
-
-        # It only enteres here as long as depth isn't 0
+                print("NO MORE COLUMNS LEFT, RETURN 0")
+            self.board_table[cur_hash] = DEFAULT_SCORE
+            return DEFAULT_SCORE
+        
+        if color == self.color:
+            best_score = -Inf
         else:
+            best_score = Inf
+
+        WIN_SCORE = 100 * depth
+        LOSE_SCORE = -100 * depth
+
+        for column in empty_columns:
+            board.add_piece(color, column)
+            is_win = board.check_win_optimized(column)
+
+            if self.print:
+                print(board)
+
+            if is_win:
+                board.remove_piece(column)
+                if color == self.color:
+                    if self.print:
+                        print("I WON, RETURN 100", depth)
+                    self.board_table[cur_hash] = WIN_SCORE
+                    return WIN_SCORE
+                else:
+                    if self.print:
+                        print("I LOST RETURN -100", depth)
+                    self.board_table[cur_hash] = LOSE_SCORE
+                    return LOSE_SCORE
+
             if color == self.color:
-                bestVal = -Inf
-                for new_column in empty_columns:
-                    board.add_piece(self.color, column)
-                    if self.print:
-                        print("LOOKING AT LOCATION", board.find_lowest(column) + 1, column)
-                        print(board)
-                    value = self.minimax(board, depth-1, self.opposite_color, new_column)
-                    remove = board.remove_piece(column)
-                    if not remove:
-                        print("REMOVE DIDN'T WORK")
-                    bestVal = max(bestVal, value)
-                return bestVal
+                score = self.minimax(board, depth - 1, self.opposite_color)
             else:
-                bestVal = Inf
-                for new_column in empty_columns:
-                    board.add_piece(self.opposite_color, column)
-                    if self.print:
-                        print("LOOKING AT LOCATION", board.find_lowest(column), column)
-                        print(board)
-                    value = self.minimax(board, depth-1, self.color, new_column)
-                    remove = board.remove_piece(column)
-                    if not remove:
-                        print("REMOVE DIDN'T WORK")
-                    bestVal = min(bestVal, value)
-                return bestVal
+                score = self.minimax(board, depth - 1, self.color)
+
+            if color == self.color:
+                if score > best_score:
+                    best_score = score
+            else:
+                if score < best_score:
+                    best_score = score
+
+            board.remove_piece(column)
+
+        # For loop for each legal move
+            # Add the piece
+            # Check win
+            # If it wins, return the score dependent on wether color is self.color or self.opposite_color
+            # SCORE = Otherwise, call next depth with this board
+            # Remove the move
+        return best_score
+
+
+
+
+    
