@@ -17,8 +17,5 @@ class ai_handler:
         elif ai == "miniminimax":
             self.ai = miniminimax(color, depth)
 
-    def get_answer(self, arr, board):
-        if self.ai == "miniminimax":
-            return self.ai.answer(board)
-        else:
-            return self.ai.answer(arr, board)
+    def get_answer(self, arr, board, zobrist):
+        return self.ai.answer(arr, board, zobrist)

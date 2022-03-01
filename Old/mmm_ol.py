@@ -1,9 +1,9 @@
-from copy import copy
 import random
 from time import sleep
 from Board import Board
 import numpy as np
 import concurrent.futures
+
 from numpy import Inf
 
 class miniminimax:
@@ -11,82 +11,77 @@ class miniminimax:
     def __init__(self, color, depth):
         self.color = color
         self.depth = depth
-
         if color == "X":
             self.opposite_color = "O"
         else:
             self.opposite_color = "X"
-
         self.print = False
-        self.delay = 0
+        self.delay = .01
 
         self.answer_count = 0
         self.minimax_count = 0
         self.hash_table_count = 0
         self.hash_table_count_total = 0
-        
+
+        self.board_table = {}
 
     # Method to return the final answer of the minimax
     # Takes in arr of empty columns for random choice at end
     # Takes in board which it will directly manipulate as it searches for answer
-    def answer(self, arr, board, zobrist):
-        print("COLUMNS", arr)
-        zobrist.clear()
+    def answer(self, arr, board):
         self.answer_count += 1
         
+        self.board_table = {}
         # These lists will hold the most optimal next moves and return a random one at the end
         next_turn_win_choices = []
+        choices = []
 
-        # Just looking if there is a win next turn so I can quickly return before
-        # going into the minimax 
+        # The current best evaluation is set as -Inf so it can get overwritten by any other move
+        choices_values = -Inf
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            temp_board = board
+            executor.map(self.minimax(temp_board,))
+
+        # Now, send the board and its current state into the minimax function
         for column in arr:
-            board.add_piece(self.color, column, zobrist)
+            board.add_piece(self.color, column)
             is_win = board.check_win_optimized(column)
-            board.remove_piece(column, zobrist)
-
+            
             if is_win:
+                board.remove_piece(column)
                 if self.print:
                     print("I HAVE AN ANSWER:", column)
                 next_turn_win_choices.append(column)
+                continue
+            
+            thread = threading.Thread(target=self.minimax, args=(board,self.depth,self.opposite_color))
+            
+            #value = self.minimax(board, self.depth, self.opposite_color)
+            board.remove_piece(column)
+
+            if value > choices_values:
+                choices.clear()
+                choices_values = value
+                choices.append(column)
+            elif value == choices_values:
+                choices.append(column)
+
+        self.hash_table_count_total += self.hash_table_count
+        print("HASH TABLE COUNT:", self.hash_table_count_total)
+        
 
         if next_turn_win_choices:
             return random.choice(next_turn_win_choices)
-
-        # ------------------------
-        # ------Multiprocess------
-        # ------------------------
-
-        value_list = []
-        with concurrent.futures.ProcessPoolExecutor() as executor:
-            for i in arr:
-                process_values = executor.submit(self.minimax_process_helper, zobrist, board, \
-                                                self.depth, self.color, i)
-                value_list.append(process_values.result())
-
-        max_value = max(value_list)
-        choices = [index for index, value in enumerate(value_list) if value == max_value]
-        print("VALUE_LIST", value_list)
-        print("CHOICES", choices)
-        #print("ZOBRIST",self.hash_table_count_total)
-        choice = random.choice(choices)
-        print("CHOICE", choice)
-        return arr[choice]
+        elif choices:
+            return random.choice(choices)
 
 
-    def minimax_process_helper(self, zobrist, board, depth, color, column):
-        temp_board = copy(board)
-        temp_board.add_piece(color, column, zobrist)
-        ans = self.minimax(zobrist, temp_board, depth, self.opposite_color)
-        temp_board.remove_piece(column, zobrist)
-        self.hash_table_count_total += self.hash_table_count
-        return ans
-
-
-    def minimax(self, zobrist, board, depth, color):
-        cur_hash = zobrist.zHash
-        if cur_hash in zobrist.board_table:
+    def minimax(self, board, depth, color):
+        cur_hash = board.zHash
+        if cur_hash in self.board_table:
             self.hash_table_count += 1
-            return zobrist.board_table[cur_hash]
+            return self.board_table[cur_hash]
 
         self.minimax_count += 1
         if self.print:
@@ -98,7 +93,7 @@ class miniminimax:
         if depth == 0:
             if self.print:
                 print("NO INFO GAINED, RETURN 0")
-            zobrist.board_table[cur_hash] = DEFAULT_SCORE
+            self.board_table[cur_hash] = DEFAULT_SCORE
             return DEFAULT_SCORE
         
         # Or if there are no more empty columns, return default score, it's a tie
@@ -107,7 +102,7 @@ class miniminimax:
         if not empty_columns:
             if self.print:
                 print("NO MORE COLUMNS LEFT, RETURN 0")
-            zobrist.board_table[cur_hash] = DEFAULT_SCORE
+            self.board_table[cur_hash] = DEFAULT_SCORE
             return DEFAULT_SCORE
         
         if color == self.color:
@@ -119,29 +114,29 @@ class miniminimax:
         LOSE_SCORE = -100 * depth
 
         for column in empty_columns:
-            board.add_piece(color, column, zobrist)
+            board.add_piece(color, column)
             is_win = board.check_win_optimized(column)
 
             if self.print:
                 print(board)
 
             if is_win:
-                board.remove_piece(column, zobrist)
+                board.remove_piece(column)
                 if color == self.color:
                     if self.print:
                         print("I WON, RETURN 100", depth)
-                    zobrist.board_table[cur_hash] = WIN_SCORE
+                    self.board_table[cur_hash] = WIN_SCORE
                     return WIN_SCORE
                 else:
                     if self.print:
                         print("I LOST RETURN -100", depth)
-                    zobrist.board_table[cur_hash] = LOSE_SCORE
+                    self.board_table[cur_hash] = LOSE_SCORE
                     return LOSE_SCORE
 
             if color == self.color:
-                score = self.minimax(zobrist, board, depth - 1, self.opposite_color)
+                score = self.minimax(board, depth - 1, self.opposite_color)
             else:
-                score = self.minimax(zobrist, board, depth - 1, self.color)
+                score = self.minimax(board, depth - 1, self.color)
 
             if color == self.color:
                 if score > best_score:
@@ -150,7 +145,7 @@ class miniminimax:
                 if score < best_score:
                     best_score = score
 
-            board.remove_piece(column, zobrist)
+            board.remove_piece(column)
 
         # For loop for each legal move
             # Add the piece

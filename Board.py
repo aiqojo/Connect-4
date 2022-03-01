@@ -2,6 +2,8 @@
 import sys
 import numpy as np
 
+from Zobrist import Zobrist
+
 class Board(object):
 
     p1 = "X"
@@ -15,10 +17,6 @@ class Board(object):
         self.board = np.empty((6,7), dtype='str')
         self.board[:] = ' '
         self.lowest_row = np.full((1,7), 5)
-        
-        # Randomly initialized an int64 that will be used for the zobrist hashing
-        self.zArray = np.random.randint(sys.maxsize, size=(6,7,2), dtype=np.uint64)
-        self.zHash = 0
 
         self.board_history = ''
 
@@ -27,6 +25,8 @@ class Board(object):
         self.remove_piece_count = 0
         self.find_empty_columns_count = 0
         self.check_win_optimized_count = 0
+
+    
 
     def reset(self):
         if self.print:
@@ -37,16 +37,16 @@ class Board(object):
         self.lowest_row = np.full((1,7), 5)
 
 
-    def get_board_state(self):
+    def get_board_history(self):
         return self.board_history
 
 
-    def add_piece(self, color, column):
+    def add_piece(self, color, column, zobrist):
         #print(self.lowest_row)
         self.add_piece_count += 1
         #column = int(column)
         row = self.lowest_row[0,column]
-        if row == -1:
+        if row <= -1:
             return False
         else:
             self.board[row,column] = color.upper()
@@ -54,12 +54,13 @@ class Board(object):
 
             #Zobrist hashing stuff
             if color == "X":
-                self.zHash ^= int(self.zArray[row,column,0])
+                zobrist.zHash ^= int(zobrist.zArray[row,column,0])
             else:
-                self.zHash ^= int(self.zArray[row,column,1])
+                zobrist.zHash ^= int(zobrist.zArray[row,column,1])
             return True
 
-    def remove_piece(self,column):
+
+    def remove_piece(self,column, zobrist):
         self.remove_piece_count += 1
         row = self.lowest_row[0,column] + 1
         if row > 5:
@@ -70,9 +71,9 @@ class Board(object):
             color = self.board[row,column]
             #Zobrist hashing stuff
             if color == "X":
-                self.zHash ^= int(self.zArray[row,column,0])
+                zobrist.zHash ^= int(zobrist.zArray[row,column,0])
             else:
-                self.zHash ^= int(self.zArray[row,column,1])
+                zobrist.zHash ^= int(zobrist.zArray[row,column,1])
             return True
 
 

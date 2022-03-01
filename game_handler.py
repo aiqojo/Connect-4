@@ -3,8 +3,9 @@ from time import sleep
 
 class game_handler():
 
-    def __init__(self, board, red, yellow, delay, print):
+    def __init__(self, board, zobrist, red, yellow, delay, print):
         self.board = board
+        self.zobrist = zobrist
         self.red = red # red (X)
         self.yellow = yellow # yellow (O)
         self.delay = delay
@@ -37,7 +38,7 @@ class game_handler():
                 winner = "T"
                 break
 
-            column_choice = self.red.get_answer(self.board.find_empty_columns(), self.board)
+            column_choice = self.red.get_answer(self.board.find_empty_columns(), self.board, self.zobrist)
 
             if self.print:
                 print("RED'S CHOICE IS:", column_choice)
@@ -48,7 +49,7 @@ class game_handler():
                 winner = "T"
                 break
 
-            self.board.add_piece("X", column_choice)
+            self.board.add_piece("X", column_choice, self.zobrist)
             if self.print:
                 print(self.board)
 
@@ -82,7 +83,7 @@ class game_handler():
                 break
 
             #column_choice = input("Enter column: ")
-            column_choice = self.yellow.get_answer(self.board.find_empty_columns(), self.board)
+            column_choice = self.yellow.get_answer(self.board.find_empty_columns(), self.board, self.zobrist)
 
             if self.print:
                 print("YELLOW'S CHOICE IS:", column_choice)
@@ -93,7 +94,7 @@ class game_handler():
                 winner = "T"
                 break
             else:
-                self.board.add_piece("O", column_choice)
+                self.board.add_piece("O", column_choice, self.zobrist)
                 if self.print:
                     print(self.board)
 
