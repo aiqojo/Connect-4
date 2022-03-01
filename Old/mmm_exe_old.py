@@ -1,10 +1,9 @@
 from copy import copy
-from functools import partial
 import random
 from time import sleep
 from Board import Board
 import numpy as np
-import multiprocessing as mp
+import concurrent.futures
 from numpy import Inf
 
 class miniminimax:
@@ -28,9 +27,8 @@ class miniminimax:
     # Takes in arr of empty columns for random choice at end
     # Takes in board which it will directly manipulate as it searches for answer
     def answer(self, arr, board, zobrist):
-        if self.print:
-            print("COLUMNS", arr)
-            print(zobrist.count)
+        print("COLUMNS", arr)
+        print(zobrist.count)
         zobrist.clear()
         self.answer_count += 1
         
@@ -57,24 +55,20 @@ class miniminimax:
         # ------------------------
 
         value_list = []
-        jobs = []
-
-        func = partial(self.minimax_process_helper, zobrist, board, self.depth, self.color)
-
-        pool = mp.Pool()
-        value_list = pool.map(func, arr)
-        pool.close()
-        pool.join()   
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            for i in arr:
+                process_values = executor.submit(self.minimax_process_helper, zobrist, board, \
+                                                self.depth, self.color, i)
+                print("done with",i)
+                value_list.append(process_values.result())
 
         max_value = max(value_list)
         choices = [index for index, value in enumerate(value_list) if value == max_value]
-        if self.print:
-            print("VALUE_LIST", value_list)
-            print("CHOICES", choices)
+        print("VALUE_LIST", value_list)
+        print("CHOICES", choices)
         #print("ZOBRIST",self.hash_table_count_total)
         choice = random.choice(choices)
-        if self.print:
-            print("CHOICE", choice)
+        print("CHOICE", choice)
         return arr[choice]
 
 
@@ -89,9 +83,9 @@ class miniminimax:
     def minimax(self, zobrist, board, depth, color):
         cur_hash = zobrist.zHash
         if cur_hash in zobrist.board_table:
-            #print("ENETERED", zobrist.count)
+            print("ENETERED", zobrist.count)
             zobrist.count += 1
-            #print(zobrist.count)
+            print(zobrist.count)
             return zobrist.board_table[cur_hash]
 
         self.minimax_count += 1
