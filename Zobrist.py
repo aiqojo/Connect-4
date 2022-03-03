@@ -10,7 +10,8 @@ class Zobrist():
         self.count = 0
 
     def clear(self):
-        #print("ZOBRIST COUNT",self.count)
+        self.count = 0
+        print("ZOBRIST COUNT",self.count)
         self.board_table = {}
 
     

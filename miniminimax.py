@@ -52,26 +52,25 @@ class miniminimax:
         if next_turn_win_choices:
             return random.choice(next_turn_win_choices)
 
-        # ------------------------
-        # ------Multiprocess------
-        # ------------------------
 
+        # If it gets here there is no next turn win so we start the minimax for each column
         value_list = []
-        jobs = []
 
-        func = partial(self.minimax_process_helper, zobrist, board, self.depth, self.color)
+        for column in arr:
+            board.add_piece(self.color, column, zobrist)
+            value = self.minimax(zobrist, board, self.depth, self.opposite_color)
+            board.remove_piece(column, zobrist)
+            value_list.append(value)
 
-        pool = mp.Pool()
-        value_list = pool.map(func, arr)
-        pool.close()
-        pool.join()   
-
+        # This is graabing the list of largest value or values if tied
         max_value = max(value_list)
         choices = [index for index, value in enumerate(value_list) if value == max_value]
+
         if self.print:
             print("VALUE_LIST", value_list)
             print("CHOICES", choices)
-        #print("ZOBRIST",self.hash_table_count_total)
+        
+        # This picks a random choice from the choices list then finds the column of that choice in the original array
         choice = random.choice(choices)
         if self.print:
             print("CHOICE", choice)
@@ -165,8 +164,3 @@ class miniminimax:
             # SCORE = Otherwise, call next depth with this board
             # Remove the move
         return best_score
-
-
-
-
-    

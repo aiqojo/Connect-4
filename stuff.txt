@@ -217,3 +217,17 @@ def minimax(self, board, depth, color, column):
     #     if isinstance(other, Board):
     #         return self.__key() == other.__key()
     #     return NotImplemented
+
+
+    
+        # ------------------------
+        # ------Multiprocess------
+        # ------------------------
+
+        
+        # func = partial(self.minimax_process_helper, zobrist, board, self.depth, self.color)
+
+        # pool = mp.Pool()
+        # value_list = pool.map(func, arr)
+        # pool.close()
+        # pool.join()

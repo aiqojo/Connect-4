@@ -8,7 +8,7 @@ import time
 #randoprodigy
 
 def main():
-    run_cycle(1000)
+    run_cycle(10)
 
 def run_cycle(rounds):
 
@@ -22,7 +22,6 @@ def run_cycle(rounds):
     # Set true or false if you want extra stuff printed into terminal
     zobrist = Zobrist()
     board = Board(False)
-    
 
     # player        -> ai_handler("player", color, 0)
     # randy         -> ai_handler("randy", color, 0)
