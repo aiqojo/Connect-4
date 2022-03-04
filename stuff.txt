@@ -231,3 +231,11 @@ def minimax(self, board, depth, color, column):
         # value_list = pool.map(func, arr)
         # pool.close()
         # pool.join()
+
+
+def minimax_process_helper(self, zobrist, board, depth, color, column):
+        temp_board = copy(board)
+        temp_board.add_piece(color, column, zobrist)
+        ans = self.minimax(zobrist, temp_board, depth, self.opposite_color)
+        temp_board.remove_piece(column, zobrist)
+        return ans

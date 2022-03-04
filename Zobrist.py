@@ -11,7 +11,7 @@ class Zobrist():
 
     def clear(self):
         self.count = 0
-        print("ZOBRIST COUNT",self.count)
+        #print("ZOBRIST COUNT",self.count)
         self.board_table = {}
 
     
