@@ -18,7 +18,7 @@ class mediminimax:
         else:
             self.opposite_color = "X"
 
-        self.print = True
+        self.print = False
         self.delay = 0
 
         self.answer_count = 0
@@ -46,15 +46,21 @@ class mediminimax:
                 next_turn_win_choices.append(column)
 
         if next_turn_win_choices:
-            print("Zobrist matches", zobrist.count)
+            if self.print:
+                print("Zobrist matches", zobrist.count)
             zobrist.clear()
             choice = random.choice(next_turn_win_choices)
-            print("CHOICE", choice)
+            if self.print:
+                print("CHOICE", choice)
             return choice
 
 
         # If it gets here there is no next turn win so we start the minimax for each column
         value_list = []
+
+        #arr = self.optimized_order(board, arr)
+        if self.print:
+            print("Optimized order:", arr)
 
         for column in arr:
             board.add_piece(self.color, column, zobrist)
@@ -77,6 +83,24 @@ class mediminimax:
             zobrist.clear()
             print("CHOICE", choice)
         return arr[choice]
+
+    # This method should help speed up the minimax function
+    # It does that by ordering the columns in an optimized way
+    # If the minimax function is able to find a higher score for a specific choice from the beginning
+    # it can prune more branches as it continues and take less time to give a result
+    def optimized_order(self, board, arr):
+        opt_arr = []
+
+        for i in range(6):
+            if board.last_column + i <= 6 and board.last_column + i not in opt_arr and board.last_column + i in arr:
+                opt_arr.append(board.last_column + i)
+            if board.last_column - i >= 0  and board.last_column - i not in opt_arr  and board.last_column - i in arr:
+                opt_arr.append(board.last_column - i)
+
+        if len(opt_arr) == 0:
+            return arr
+
+        return opt_arr
 
     # Alpha is red's best evaluation, beta is yellow's
     def minimax(self, zobrist, board, depth, alpha, beta, color):
@@ -159,3 +183,4 @@ class mediminimax:
                 if beta <= alpha:
                     break
             return min_score
+            

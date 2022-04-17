@@ -8,7 +8,7 @@ import time
 #randoprodigy
 
 def main():  
-    run_cycle(1)
+    run_cycle(100)
 
 def run_cycle(rounds):
 
@@ -29,13 +29,13 @@ def run_cycle(rounds):
     # miniminimax   -> ai_handler("miniminimax", color, depth)
     
     # Color can either be "X" for red, or "O" for yellow
-    red = ai_handler("mediminimax", "X", 11)
-    yellow = ai_handler("mediminimax", "O", 11)
-
+    red = ai_handler("mediminimax", "X", 5)
+    yellow = ai_handler("mediminimax", "O", 5)
+ 
     # The 4th parameter is time between rounds
     # Set from .25-2 seconds for ease of viewing, otherwise set to 0
     # Last parameter is for having it print into the terminal
-    game = game_handler(board, zobrist, red, yellow, 0, True)
+    game = game_handler(board, zobrist, red, yellow, 0, False)
     
     total_start_time = time.time()
     start_time = time.time() 
@@ -56,7 +56,7 @@ def run_cycle(rounds):
         #print(board.__hash__())
         board.reset()
     
-        if i % 1 == 0 and i != 0:
+        if i % 10 == 0 and i != 0:
             epoch_count += 1
             epoch_time = time.time()
             print(red.name, "RED DEPTH:", red.ai.depth, yellow.name, "YELLOW DEPTH:", yellow.ai.depth)

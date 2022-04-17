@@ -17,6 +17,7 @@ class Board(object):
         self.board = np.empty((6,7), dtype='str')
         self.board[:] = ' '
         self.lowest_row = np.full((1,7), 5)
+        self.last_column = 3
 
         self.board_history = ''
 
@@ -25,7 +26,6 @@ class Board(object):
         self.remove_piece_count = 0
         self.find_empty_columns_count = 0
         self.check_win_optimized_count = 0
-
     
 
     def reset(self):
