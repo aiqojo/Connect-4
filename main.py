@@ -29,13 +29,13 @@ def run_cycle(rounds):
     # miniminimax   -> ai_handler("miniminimax", color, depth)
     
     # Color can either be "X" for red, or "O" for yellow
-    red = ai_handler("mediminimax", "X", 11)
-    yellow = ai_handler("mediminimax", "O", 11)
+    red = ai_handler("player", "X", 11)
+    yellow = ai_handler("mediminimax", "O", 7)
 
     # The 4th parameter is time between rounds
     # Set from .25-2 seconds for ease of viewing, otherwise set to 0
     # Last parameter is for having it print into the terminal
-    game = game_handler(board, zobrist, red, yellow, 0, True)
+    game = game_handler(board, zobrist, red, yellow, 1, True)
     
     total_start_time = time.time()
     start_time = time.time() 
@@ -59,13 +59,14 @@ def run_cycle(rounds):
         if i % 1 == 0 and i != 0:
             epoch_count += 1
             epoch_time = time.time()
-            print(red.name, "RED DEPTH:", red.ai.depth, yellow.name, "YELLOW DEPTH:", yellow.ai.depth)
-            print("ITERATION:", i, "VALUES:", red_wins, yellow_wins, ties)
-            print("ABOVE EPOCH TOOK:", epoch_time - start_time, "SECONDS")
-            epoch_total_time += (epoch_time - start_time)
-            print("AVERAGE EPOCH TIME:", epoch_total_time/epoch_count)
-            print("-------------------")
-            start_time = time.time()
+            if red.name != "player" and yellow.name != "player":
+                print(red.name, "RED DEPTH:", red.ai.depth, yellow.name, "YELLOW DEPTH:", yellow.ai.depth)
+                print("ITERATION:", i, "VALUES:", red_wins, yellow_wins, ties)
+                print("ABOVE EPOCH TOOK:", epoch_time - start_time, "SECONDS")
+                epoch_total_time += (epoch_time - start_time)
+                print("AVERAGE EPOCH TIME:", epoch_total_time/epoch_count)
+                print("-------------------")
+                start_time = time.time()
             
 
     print("FINAL:", red_wins, yellow_wins, ties)
@@ -75,8 +76,10 @@ def run_cycle(rounds):
 
     print("ap:", board.add_piece_count, "\nrp:", board.remove_piece_count, "\nfe:", \
         board.find_empty_columns_count, "\ncw:", board.check_win_optimized_count)
-    print("red minimax calls:", red.ai.minimax_count)
-    print("yellow minimax calls:", yellow.ai.minimax_count)
+    if red.name != "player":
+        print("red minimax calls:", red.ai.minimax_count)
+    if yellow.name != "player":
+        print("yellow minimax calls:", yellow.ai.minimax_count)
 
     return red_wins, yellow_wins, ties
 

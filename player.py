@@ -4,7 +4,7 @@ class player:
         self.color = color
 
 
-    def answer(self, arr, board):
+    def answer(self, arr, board, zobrist):
         value = -1
 
         print(arr)

@@ -80,20 +80,23 @@ class mediminimax:
 
     # Alpha is red's best evaluation, beta is yellow's
     def minimax(self, zobrist, board, depth, alpha, beta, color):
+        # Extra information
         self.minimax_count += 1
         if self.print:
             sleep(self.delay)
 
         cur_hash = zobrist.zHash
+        # If this table has been seen before, take that value from the zobrist table
         if cur_hash in zobrist.board_table:
-            #print("ENETERED", zobrist.count)
             zobrist.count += 1
-            #print(zobrist.count)
             return zobrist.board_table[cur_hash]
 
         DEFAULT_SCORE = 0
 
         # If at 0 depth and here, no information was gained, return default score
+        # I think because of the position of this being before the big if/else below
+        # the minimax actually runs at a depth 1 lower than what you put in
+        # Maybe I'll fix this idunno
         if depth == 0:
             zobrist.board_table[cur_hash] = DEFAULT_SCORE
             return DEFAULT_SCORE
