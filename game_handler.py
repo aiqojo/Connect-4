@@ -50,6 +50,7 @@ class game_handler():
                 break
 
             self.board.add_piece("X", column_choice, self.zobrist)
+            self.board.last_column = column_choice
             if self.print:
                 print(self.board)
 
@@ -95,6 +96,7 @@ class game_handler():
                 break
             else:
                 self.board.add_piece("O", column_choice, self.zobrist)
+                self.board.last_column = column_choice
                 if self.print:
                     print(self.board)
 
