@@ -72,9 +72,9 @@ class mediminimax:
         max_value = max(value_list)
         choices = [index for index, value in enumerate(value_list) if value == max_value]
 
-        if self.print:
-            print("VALUE_LIST", value_list)
-            print("CHOICES", choices)
+        
+        print("VALUE_LIST", value_list)
+        print("CHOICES", choices)
         
         # This picks a random choice from the choices list then finds the column of that choice in the original array
         choice = random.choice(choices)
